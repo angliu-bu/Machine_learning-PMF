@@ -37,11 +37,14 @@ def load_and_tabulate_data(filename, listBinary):
     """
     rawData=np.loadtxt(filename) 
     
-    #there will be a problem WHEN there is only ONE single line of data (i.e pristine)
-    #numpyload makes the data into (ncolumn, ) instead of (1, ncolumn)
-    #to solve this we just add one more data point from pristine and then use unique function to delete the extra one
-    if len(rawData)<10:
-        rawData = np.unique(rawData, axis=0)
+    # there will be a problem WHEN there is only ONE single line of data
+    # numpy.loadtxt returns a 1D array of shape (ncolumns,) instead of
+    # (1, ncolumns).  When this happens ``len(rawData)`` gives the number of
+    # columns rather than the number of samples, which breaks the logic below.
+    # Detect this case explicitly and reshape the data so that the rest of the
+    # function always works with a 2-D array.
+    if rawData.ndim == 1:
+        rawData = rawData.reshape(1, -1)
 
     #print (len(rawData))
     #first make copies of equivalent configurations
